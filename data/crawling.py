@@ -4,7 +4,7 @@ import cryptography
 from cryptography.hazmat.primitives import hashes
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-
+import json
 
 # encrypt service key with password and save encrypted info as txt file.
 def encrypt(filename, file_data, password):
@@ -66,8 +66,28 @@ else:
     print("Invalid input....")
     exit()
 
+reg_num = str(input("지역번호를 입력하시오: "))
+s_time = str(input("시작날짜를 입력하시오 ex) 20200101 \n"))
+e_time = str(input("종료날짜를 입력하시오 ex) 20201212 \n"))
+
 url = 'http://apis.data.go.kr/1360000/AsosHourlyInfoService/getWthrDataList'
-params ={'serviceKey' : s_key, 'pageNo' : '365', 'numOfRows' : '10', 'dataType' : 'JSON', 'dataCd' : 'ASOS', 'dateCd' : 'HR', 'startDt' : '20200101', 'startHh' : '01', 'endDt' : '20200601', 'endHh' : '02', 'stnIds' : '108' }
+# numOfRows를 0으로 설정하면 한 번에 찾아내줌(시간은 많이 소요)
+# stdIds는 지역번호
+params ={'serviceKey' : s_key, 'pageNo' : '1', 'numOfRows' : '1', 'dataType' : 'JSON', 'dataCd' : 'ASOS', 'dateCd' : 'HR', 'startDt' : s_time, 'startHh' : '01', 'endDt' : e_time, 'endHh' : '05', 'stnIds' : reg_num}
 
 response = requests.get(url, params=params)
 print(response.content)
+
+response_str = str(response.content, 'utf-8')
+
+# 2. JSON 문자열 → Python dict
+response_json = json.loads(response_str)
+if response_json['response']['header']['resultCode'] != '00':
+    print("!!!! Error messsage !!!!")
+    print(str(response_json['response']['header']['resultMsg']))
+    exit()
+# 3. 원하는 값 추출
+page_no = response_json['response']['body']['pageNo']
+total_count = response_json['response']['body']['totalCount']
+
+print("totalCount:", total_count)
