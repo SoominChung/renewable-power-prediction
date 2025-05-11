@@ -110,5 +110,7 @@ with open("station_data.csv", mode="w", newline="", encoding="utf-8") as file:
         # 지점명과 지점 순서를 바꿔서 작성
         station_code, station_name = line.split("\t")
         writer.writerow([station_name, station_code])
-
-print("CSV 파일이 생성되었습니다.")
+print()
+print("------------- 지역 INFO.CSV 파일이 생성되었습니다----------------")
+print("------------- 지역 INFO.CSV 파일이 생성되었습니다----------------")
+print()
