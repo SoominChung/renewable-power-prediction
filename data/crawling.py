@@ -50,7 +50,7 @@ def decrypt(filename, password):
     except cryptography.fernet.InvalidToken:
         print("Invalid token, most likely the password is incorrect")
         return
-    print("File decrypted successfully\n\n")
+    print("File decrypted successfully\n")
     s_key_str = str(decrypted_data, 'utf-8')
     return s_key_str
 
@@ -163,8 +163,8 @@ else:
 
 for item in items:
     if 'date' in item:
-        item['sunrise'] = str(sun_data[item['date']]['sunrise'])
-        item['sunset'] = str(sun_data[item['date']]['sunset'])
+        item['sunrise'] = sun_data[item['date']]['sunrise'][:2] + ":" + sun_data[item['date']]['sunrise'][2:]
+        item['sunset'] = sun_data[item['date']]['sunset'][:2] + ":" + sun_data[item['date']]['sunset'][2:]
 
 # 먼저 모든 필드 이름 구함
 all_keys = list(items[0].keys())
