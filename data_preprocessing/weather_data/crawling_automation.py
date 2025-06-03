@@ -57,7 +57,8 @@ def decrypt(filename, password):
 
 # 설정값들 미리 정의
 PASSWORD = "0000"
-REGIONS = ['충주', '제주', '서귀포', '부산', '성산일출', '인천', '영월', '이천', '전주', '진주', '동해']
+# REGIONS = ['충주', '제주', '서귀포', '부산', '성산일출', '인천', '영월', '이천', '전주', '진주', '동해']
+REGIONS = ['제주', '서귀포', '부산', '성산일출', '인천', '영월', '이천', '전주', '진주', '동해']
 ENERGY_TYPE = 1  # 태양열
 
 # 서비스 키 가져오기
@@ -100,8 +101,18 @@ def collect_weather_data(region, start_date, end_date, energy_type, csv_filename
     response = requests.get(url, params=params)
     response_str = str(response.content, 'utf-8')
 
+
+
     # JSON 문자열 → Python dict
-    response_json = json.loads(response_str)
+    try:
+        response_json = json.loads(response_str)
+    except json.JSONDecodeError as e:
+        print(response_str)
+        print(response_json)
+        print("JSON 파싱 오류 발생:", e)
+        return False
+
+    # response_json = json.loads(response_str)
     if response_json['response']['header']['resultCode'] != '00':
         print("!!!! Error messsage !!!!")
         print(str(response_json['response']['header']['resultMsg']))
@@ -202,13 +213,13 @@ if __name__ == "__main__":
                 continue
         
         # 2025년 1월-2월 데이터 수집
-        start_date = "20250101"
-        end_date = "20250228"
-        csv_filename = f"{start_date}_{end_date}"
+        # start_date = "20250101"
+        # end_date = "20250228"
+        # csv_filename = f"{start_date}_{end_date}"
         
-        success = collect_weather_data(region, start_date, end_date, ENERGY_TYPE, csv_filename)
-        if not success:
-            print(f"{region} - 2025년 데이터 수집 실패")
+        # success = collect_weather_data(region, start_date, end_date, ENERGY_TYPE, csv_filename)
+        # if not success:
+        #     print(f"{region} - 2025년 데이터 수집 실패")
         
         print(f"========== {region} 지역 데이터 수집 완료 ==========\n")
     
