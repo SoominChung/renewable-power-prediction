@@ -8,7 +8,8 @@ import json
 import csv
 import xml.etree.ElementTree as ET
 import os
-
+import time
+from tqdm import tqdm
 # encrypt service key with password and save encrypted info as txt file.
 def encrypt(filename, file_data, password):
     num_bytes = bytes(password, "utf-8")
@@ -57,13 +58,17 @@ def decrypt(filename, password):
 
 # 설정값들 미리 정의
 PASSWORD = "0000"
+# 클리어 - 전주, 제주, 영월, 충주, 부산, 동해, 서귀포, 인천, 진주, 성산일출, 
+# REGIONS = ['이천']
 # REGIONS = ['충주', '제주', '서귀포', '부산', '성산일출', '인천', '영월', '이천', '전주', '진주', '동해']
-REGIONS = ['제주', '서귀포', '부산', '성산일출', '인천', '영월', '이천', '전주', '진주', '동해']
+# REGIONS = ['성산일출']
+REGIONS = ['이천']
+
 ENERGY_TYPE = 1  # 태양열
 
 # 서비스 키 가져오기
-s_key = decrypt('service_key.txt', PASSWORD)
-
+# s_key = decrypt('service_key.txt', PASSWORD)
+s_key = 'rGGes+YQRn7qsvorOXy7mhTVGJzkkUV1Mnf6dUIPa4xQVwxZo14PEmBXAGK6ADV9U3l4nWy+zroL/zkUIIZPwA=='
 # make_region.py 실행
 with open("make_region.py") as f:
     code = f.read()
@@ -108,7 +113,7 @@ def collect_weather_data(region, start_date, end_date, energy_type, csv_filename
         response_json = json.loads(response_str)
     except json.JSONDecodeError as e:
         print(response_str)
-        print(response_json)
+        # print(response_json)
         print("JSON 파싱 오류 발생:", e)
         return False
 
@@ -142,7 +147,13 @@ def collect_weather_data(region, start_date, end_date, energy_type, csv_filename
     # 일출, 일몰 가져오기
     url = 'http://apis.data.go.kr/B090041/openapi/service/RiseSetInfoService/getAreaRiseSetInfo'
     sun_data = {}
-    for date in dates:
+    print(len(dates))
+    i = 0
+    check = False
+    dates = list(dates) 
+    while(i < len(dates)):
+        time.sleep(0.5)
+        date = dates[i]
         params = {
             'serviceKey': s_key,
             'locdate': date,
@@ -150,20 +161,28 @@ def collect_weather_data(region, start_date, end_date, energy_type, csv_filename
         }
 
         response = requests.get(url, params=params)
-
-        # XML 파싱
+        response = requests.get(url, params=params)
+        # XML 파====
         root = ET.fromstring(response.content)
-
         # XML 구조에 따라 item을 순회
+        print(i,date)
         for item in root.iter('item'):
+            check = True
             locdate = item.findtext('locdate')
             sunrise = item.findtext('sunrise')
             sunset = item.findtext('sunset')
-
+            print(sunrise, sunset)
             if locdate and sunrise and sunset:
                 sun_data[locdate] = {'sunrise': sunrise, 'sunset': sunset}
-
+        if check == True:
+            i += 1
+            check = False
+    
     if len(sun_data) != len(dates):
+        print(len(sun_data))
+        print(response)
+        print(root.iter)
+        print(root.iter('item'))
         print("!!!! Error messsage !!!!")
         print(" 제대로 정보를 가져오지 못했습니다.\n")
         print(" 프로그램을 종료합니다.")
@@ -200,19 +219,23 @@ if __name__ == "__main__":
     # 모든 지역에 대해 데이터 수집
     for region in REGIONS:
         print(f"\n========== {region} 지역 데이터 수집 시작 ==========")
+        print("지금")
         
         # 2013년부터 2024년까지 연도별로 데이터 수집
-        for year in range(2013, 2025):
+        year = 2018
+        # for year in range(2013, 2023):
+        while (year <= 2022):
             start_date = f"{year}0101"
             end_date = f"{year}1231"
             csv_filename = f"{start_date}_{end_date}"
             
             success = collect_weather_data(region, start_date, end_date, ENERGY_TYPE, csv_filename)
+            # time.sleep(60)
             if not success:
                 print(f"{region} - {year}년 데이터 수집 실패")
                 continue
-        
-        # 2025년 1월-2월 데이터 수집
+            year += 1
+        # # 2025년 1월-2월 데이터 수집
         # start_date = "20250101"
         # end_date = "20250228"
         # csv_filename = f"{start_date}_{end_date}"
