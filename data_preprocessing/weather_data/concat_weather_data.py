@@ -38,16 +38,19 @@ def concat_csvs_by_region_and_year(base_dir, region, start_year, end_year, outpu
     output_filename = f"{region}{start_year}_{end_year}.parquet"
     output_path = os.path.join(output_dir, output_filename)
 
+    # 날짜 column을 문자열로 변환 후 형식 변경
+    combined_df['date'] = pd.to_datetime(combined_df['date'].astype(str), format='%Y%m%d').dt.strftime('%Y-%m-%d')    
     # CSV 저장
     # combined_df.to_parquet(output_path, index=False)
     # combined_df.to_csv(output_path, index=False, encoding='utf-8-sig')
     combined_df.to_parquet(output_path, index=False, engine='pyarrow')
+    
     print(f"[OK] 저장 완료: {output_path}")
 
 if __name__ == "__main__":
     # base_dir = os.getcwd()    # 예: 현재 디렉토리
     base_dir = os.path.abspath("../../data/weather_data")
-    output_dir = os.path.join(base_dir, "preprocessing_data")  # 결과 저장 경로
+    output_dir = os.path.join(base_dir, "preprocessed_data")  # 결과 저장 경로
     print(base_dir)
     start_year = int(input("시작년도: "))
     end_year = int(input("마지막년도: "))
@@ -55,8 +58,8 @@ if __name__ == "__main__":
     # 하위 항목 중 디렉토리인 것만 필터링
     regions = [name for name in os.listdir(base_dir)
             if os.path.isdir(os.path.join(base_dir, name))]
-    if "preprocessing_data" in regions:
-        regions.remove("preprocessing_data")
+    if "preprocessed_data" in regions:
+        regions.remove("preprocessed_data")
       # 필요한 지역들
 
     for region in regions:
