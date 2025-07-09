@@ -36,12 +36,12 @@ def concat_csvs_by_region_and_year(base_dir, region, start_year, end_year, outpu
 
     # 파일명 지정: 예) 충주2013_2021.csv
     output_filename = f"{region}{start_year}_{end_year}.parquet"
+    # output_filename = f"{region}{start_year}_{end_year}.csv"
     output_path = os.path.join(output_dir, output_filename)
 
     # 날짜 column을 문자열로 변환 후 형식 변경
     combined_df['date'] = pd.to_datetime(combined_df['date'].astype(str), format='%Y%m%d').dt.strftime('%Y-%m-%d')    
     # CSV 저장
-    # combined_df.to_parquet(output_path, index=False)
     # combined_df.to_csv(output_path, index=False, encoding='utf-8-sig')
     combined_df.to_parquet(output_path, index=False, engine='pyarrow')
     
