@@ -33,9 +33,8 @@ for region in os.listdir(root_path):
 
             keyword = parts[1]
             start_ym = parts[2]
-
             try:
-                current_base_date = datetime.strptime(start_ym + '01', '%Y%m%d')
+                current_base_date = datetime.strptime(start_ym , '%Y%m%d')
             except Exception as e:
                 print(f"시작월 파싱 실패 {start_ym}: {e}")
                 continue
@@ -59,18 +58,19 @@ for region in os.listdir(root_path):
                         if m:
                             date_str = m.group(1)
                             current_base_date = datetime.strptime(date_str, '%Y%m%d')
-                            print(f"기준 날짜 변경: {current_base_date.strftime('%Y%m%d')}")
+                            # print(f"기준 날짜 변경: {current_base_date.strftime('%Y%m%d')}")
                             continue
 
                 try:
                     day_int = int(day_val)
                 except:
                     continue
-
-                actual_date = current_base_date + timedelta(days=day_int - 1)
+                # print(current_base_date + timedelta(days=day_int - 1))
+                # print(current_base_date)
+                # actual_date = current_base_date + timedelta(days=day_int - 1)
 
                 new_row = row.copy()
-                new_row['day'] = actual_date.strftime('%Y%m%d')
+                new_row['day'] = current_base_date.strftime('%Y%m%d')
                 processed_rows.append(new_row)
 
             df_processed = pd.DataFrame(processed_rows)
@@ -79,7 +79,6 @@ for region in os.listdir(root_path):
             # 1. 가장 row가 긴 df 기준 선택
         l = sorted(l, key=lambda df: len(df), reverse=True)
         base_df = l[0]
-        print(base_df)
         merged_df = base_df[['day', 'hour', 'forecast']].copy()
         base_colname = base_df.columns[3]
         merged_df[base_colname] = base_df[base_colname]
@@ -96,7 +95,7 @@ for region in os.listdir(root_path):
                 how='outer'
             )
             print(f"✅ 병합 완료: {col_name}")
-
+        
         # 3. forecast 정수 변환 및 정렬
         merged_df['forecast'] = pd.to_numeric(merged_df['forecast'], errors='coerce')
         merged_df = merged_df.sort_values(by=['day', 'hour', 'forecast'], ascending=[True, True, True])
@@ -110,15 +109,25 @@ for region in os.listdir(root_path):
     df_combined = df_combined.sort_values(by=['day', 'hour', 'forecast'], ascending=[True, True, True])
     # df_combined = pd.concat([df1, df2], ignore_index=True)
     # 4. 저장 경로 지정
+    df_combined['hour'] = df_combined['hour'].astype(int)
+    df_combined['hour'] = df_combined['hour'].fillna('').astype(str)
+    df_combined['forecast'] = df_combined['forecast'].astype(int)
+    df_combined['forecast'] = df_combined['forecast'].fillna('').astype(str)
+
+    
+    df_combined[df_combined.columns[3]] = df_combined[df_combined.columns[3]].fillna('').astype(str)
+    df_combined[df_combined.columns[4]] = df_combined[df_combined.columns[4]].fillna('').astype(str)
+    df_combined[df_combined.columns[5]] = df_combined[df_combined.columns[5]].fillna('').astype(str)
+    df_combined[df_combined.columns[6]] = df_combined[df_combined.columns[6]].fillna('').astype(str)
+    df_combined[df_combined.columns[7]] = df_combined[df_combined.columns[7]].fillna('').astype(str)
     output_dir = '../../data/total_data'
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, region +  '_prediction_weather_data.parquet')
-    print(region, len(df_combined))
     # kkkk.append((region, len(df_combined)))
     # print(kkkk)
     # 5. 저장
     df_combined.to_parquet(output_path, index=False, engine='pyarrow')
-
+    
     # df_combined.to_csv(output_path, index=False)
     print(f"\n✅ 병합 파일 저장 완료: {output_path}")
 # [('제주', 350211), ('성산일출', 350211), ('영월', 350211), ('인천', 350211), ('전주', 350211), ('동해', 350211), ('부산', 350211), ('서귀포', 350211), ('이천', 350211), ('충주', 350211), ('진주', 350211)]
