@@ -58,12 +58,8 @@ def decrypt(filename, password):
 
 # 설정값들 미리 정의
 PASSWORD = "0000"
-# 클리어 - 인천, 충주, 제주, 서귀포, 성산일출, 
-# REGIONS = 
-# REGIONS = ['충주', '제주', '서귀포', '부산', '성산일출', '인천', '영월', '이천', '전주', '진주', '동해']
-# REGIONS = ['성산일출']
-REGIONS = ['음성']
-
+REGIONS = list(input("지역의 이름을 입력하시오: "))
+# REGIONS = []
 ENERGY_TYPE = 1  # 태양열
 
 # 서비스 키 가져오기
@@ -220,21 +216,21 @@ if __name__ == "__main__":
     for region in REGIONS:
         print(f"\n========== {region} 지역 데이터 수집 시작 ==========")
         print("지금")
-        
+        start_year = int(input("시작년도: "))
+        last_year = int(input("마지막년도: "))
         # 2013년부터 2024년까지 연도별로 데이터 수집
-        year = 2018
         # for year in range(2013, 2023):
-        while (year <= 2022):
-            start_date = f"{year}0101"
-            end_date = f"{year}1231"
+        while (start_year <= last_year):
+            start_date = f"{start_year}0101"
+            end_date = f"{start_year}1231"
             csv_filename = f"{start_date}_{end_date}"
             
             success = collect_weather_data(region, start_date, end_date, ENERGY_TYPE, csv_filename)
             # time.sleep(60)
             if not success:
-                print(f"{region} - {year}년 데이터 수집 실패")
+                print(f"{region} - {start_year}년 데이터 수집 실패")
                 continue
-            year += 1
+            start_year += 1
         # # 2025년 1월-2월 데이터 수집
         # start_date = "20250101"
         # end_date = "20250228"
