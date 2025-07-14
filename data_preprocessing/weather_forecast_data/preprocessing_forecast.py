@@ -58,17 +58,12 @@ for region in os.listdir(root_path):
                         if m:
                             date_str = m.group(1)
                             current_base_date = datetime.strptime(date_str, '%Y%m%d')
-                            # print(f"기준 날짜 변경: {current_base_date.strftime('%Y%m%d')}")
                             continue
 
                 try:
                     day_int = int(day_val)
                 except:
                     continue
-                # print(current_base_date + timedelta(days=day_int - 1))
-                # print(current_base_date)
-                # actual_date = current_base_date + timedelta(days=day_int - 1)
-
                 new_row = row.copy()
                 new_row['day'] = current_base_date.strftime('%Y%m%d')
                 processed_rows.append(new_row)
@@ -113,21 +108,15 @@ for region in os.listdir(root_path):
     df_combined['hour'] = df_combined['hour'].fillna('').astype(str)
     df_combined['forecast'] = df_combined['forecast'].astype(int)
     df_combined['forecast'] = df_combined['forecast'].fillna('').astype(str)
-
+    for i in range(5):
+        df_combined[df_combined.columns[i+3]] = df_combined[df_combined.columns[i]].fillna('').astype(str)
     
-    df_combined[df_combined.columns[3]] = df_combined[df_combined.columns[3]].fillna('').astype(str)
-    df_combined[df_combined.columns[4]] = df_combined[df_combined.columns[4]].fillna('').astype(str)
-    df_combined[df_combined.columns[5]] = df_combined[df_combined.columns[5]].fillna('').astype(str)
-    df_combined[df_combined.columns[6]] = df_combined[df_combined.columns[6]].fillna('').astype(str)
-    df_combined[df_combined.columns[7]] = df_combined[df_combined.columns[7]].fillna('').astype(str)
     output_dir = '../../data/total_data'
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, region +  '_prediction_weather_data.parquet')
-    # kkkk.append((region, len(df_combined)))
-    # print(kkkk)
+    
     # 5. 저장
     df_combined.to_parquet(output_path, index=False, engine='pyarrow')
     
     # df_combined.to_csv(output_path, index=False)
     print(f"\n✅ 병합 파일 저장 완료: {output_path}")
-# [('제주', 350211), ('성산일출', 350211), ('영월', 350211), ('인천', 350211), ('전주', 350211), ('동해', 350211), ('부산', 350211), ('서귀포', 350211), ('이천', 350211), ('충주', 350211), ('진주', 350211)]

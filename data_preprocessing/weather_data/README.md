@@ -4,7 +4,7 @@
 ## File explanation
 ### make_region.py
 #### 본 파일은 지역을 번호로 매핑한 정보를 csv로 만들기위한 파일이다. 이 파일은 crawling.py가 실행됨에따라 자동으로 실행된다.
-### crawling.py
+### crawling_weather_data.py
 #### 본 파일은 기상청의 데이터와 일몰,일출시간 데이터를 수집하고 csv파일로 만들기위한 파일이다. 실행은 아래의 Execute를 확인하면된다.
 
 ## Execute
