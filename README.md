@@ -30,13 +30,14 @@ Transformer + PatchTSMixer 기반 모델 사용
 
 ### [3] Project Structure
 
-<pre><code>```text renewable-power-prediction/ ├── data/ # 데이터 저장 폴더 ├── data_preprocessing/ # 데이터 전처리 관련 파일 │ ├── merge_datas/ # 태양광 발전량 데이터 + 날씨 데이터 + 기상 예보 데이터 병합 │ ├── solar_energy/ # 태양광 발전량 데이터 처리 │ ├── weather_data/ # 날씨 데이터 처리 │ └── weather_forecast_data/ # 기상 예보 데이터 처리 ├── modeling/ # 모델링 관련 파일 │ ├── modeling.py # 훈련 코드 │ ├── run_experiments.sh # 실험 실행 스크립트 │ ├── complete_solar_prediction_model.py # Transformer 인코더 기반 최종 예측 모델 │ └── simple_solar_model.py # CNN 인코더 기반 간단한 예측 모델 ├── result_analysis/ # 결과 분석 모듈 ├── README.md └── requirements.txt # 패키지 의존성 ``` </code></pre>
+![Project Structure](assets/project_structure.png)
+
 ### [4] How to run
 
 1. 환경설정
-<pre><code>```pip install -r requirements.txt``` </code></pre>
+<pre><code>pip install -r requirements.txt</code></pre>
 
 2. 모델 학습 실행
-<pre><code>```
+<pre><code>
 cd modeling
-./run_experiments.sh``` </code></pre>
+./run_experiments.sh</code></pre>
